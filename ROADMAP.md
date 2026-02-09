@@ -322,7 +322,7 @@ We welcome contributions in these areas:
 - Benchmark datasets
 - Academic papers
 
-**Get Started**: Check our [Contributing Guide](CONTRIBUTING.md) and [Good First Issues](https://github.com/yourusername/codeguardian/labels/good%20first%20issue)
+**Get Started**: Check our [Contributing Guide](CONTRIBUTING.md) and [Good First Issues](https://github.com/Unknown1502/codeguardian/labels/good%20first%20issue)
 
 ---
 
@@ -344,7 +344,7 @@ We welcome contributions in these areas:
 
 ## 💡 Ideas? Suggestions?
 
-Have a killer feature idea? [Open a discussion](https://github.com/yourusername/codeguardian/discussions) or join our [Discord community](https://discord.gg/codeguardian).
+Have a killer feature idea? [Open a discussion](https://github.com/Unknown1502/codeguardian/discussions) or join our [Discord community](https://discord.gg/codeguardian).
 
 **Let's build the future of AI-powered security together! 🛡️**
 

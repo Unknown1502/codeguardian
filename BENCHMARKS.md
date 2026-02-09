@@ -177,7 +177,7 @@ Recommendation: Fix auth bypass first (breaks the chain)
 
 ```bash
 # Clone test repo
-git clone https://github.com/YOUR_USERNAME/codeguardian-benchmark.git
+git clone https://github.com/Unknown1502/codeguardian-benchmark.git
 cd codeguardian-benchmark
 
 # Run benchmark suite

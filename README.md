@@ -6,7 +6,7 @@
 [![Gemini 3](https://img.shields.io/badge/Gemini_3-Flash%20%2F%20Pro-4285F4?logo=google)](https://ai.google.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=github-actions)](https://github.com/features/actions)  
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/YOUR_USERNAME/codeguardian/blob/main/notebooks/Quick_Start.ipynb)
+[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Unknown1502/codeguardian/blob/main/notebooks/Quick_Start.ipynb)
 [![Try Demo](https://img.shields.io/badge/▶️_Try_Demo-Live-red?style=for-the-badge)](demo_live.py)
 
 ---

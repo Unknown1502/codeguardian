@@ -38,7 +38,13 @@ jobs:
       - name: Run CodeGuardian Scan
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        continue-on-error: true
         run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "⚠️ GEMINI_API_KEY not configured. Skipping scan."
+            echo "To enable: Add GEMINI_API_KEY to repository secrets"
+            exit 0
+          fi
           python src/main.py --scan . --output reports/ || echo "Scan completed with findings"
           
       - name: Generate Summary

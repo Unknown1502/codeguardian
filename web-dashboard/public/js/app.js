@@ -160,6 +160,18 @@ function setupSocketListeners() {
             showNotification('Scan failed. Check output for details.', 'error');
         }
     });
+
+    // Terminal output handler
+    socket.on('terminal-output', (data) => {
+        if (term) {
+            term.write(data.data);
+            
+            // Write new prompt when command finishes
+            if (data.exitCode !== undefined) {
+                writePrompt();
+            }
+        }
+    });
 }
 
 // ============================================================
@@ -227,14 +239,17 @@ async function scanFile() {
         outputBox.style.display = 'block';
         outputBox.textContent = data.output || 'Scan completed. Check summary below.';
 
-        if (data.report) {
+        if (data.success && data.report) {
             displayScanSummary(data.report);
+        } else if (!data.success) {
+            showNotification('Scan failed: ' + (data.error || 'Unknown error'), 'error');
         }
 
         showNotification('File scan completed!', 'success');
     } catch (error) {
         progressDiv.style.display = 'none';
         showNotification('Scan failed: ' + error.message, 'error');
+        console.error('Scan error:', error);
     }
 }
 
@@ -294,11 +309,34 @@ async function scanProject() {
 function displayScanSummary(report) {
     const summaryDiv = document.getElementById('scan-summary');
     
-    const vulnerabilities = report.vulnerabilities || [];
-    const critical = vulnerabilities.filter(v => v.severity === 'critical').length;
-    const high = vulnerabilities.filter(v => v.severity === 'high').length;
-    const medium = vulnerabilities.filter(v => v.severity === 'medium').length;
-    const low = vulnerabilities.filter(v => v.severity === 'low').length;
+    // Handle different report structures
+    let vulnerabilities = [];
+    if (report && report.vulnerabilities) {
+        // New format: vulnerabilities.list
+        if (report.vulnerabilities.list && Array.isArray(report.vulnerabilities.list)) {
+            vulnerabilities = report.vulnerabilities.list;
+        } 
+        // Old format: vulnerabilities is array directly
+        else if (Array.isArray(report.vulnerabilities)) {
+            vulnerabilities = report.vulnerabilities;
+        } else {
+            console.warn('Unexpected vulnerabilities format:', report.vulnerabilities);
+        }
+    }
+    
+    // Get counts from by_severity if available, otherwise count from list
+    let critical, high, medium, low;
+    if (report.vulnerabilities && report.vulnerabilities.by_severity) {
+        critical = report.vulnerabilities.by_severity.critical || 0;
+        high = report.vulnerabilities.by_severity.high || 0;
+        medium = report.vulnerabilities.by_severity.medium || 0;
+        low = report.vulnerabilities.by_severity.low || 0;
+    } else {
+        critical = vulnerabilities.filter(v => v && v.severity === 'critical').length;
+        high = vulnerabilities.filter(v => v && v.severity === 'high').length;
+        medium = vulnerabilities.filter(v => v && v.severity === 'medium').length;
+        low = vulnerabilities.filter(v => v && v.severity === 'low').length;
+    }
     
     const score = report.security_score || report.overall_score || 0;
     const grade = report.grade || 'N/A';
@@ -330,11 +368,36 @@ function displayScanSummary(report) {
                 </div>
             </div>
 
-            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 10px;">
-                <strong>Total Vulnerabilities:</strong> ${vulnerabilities.length}
+            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                <strong>Total Vulnerabilities:</strong> ${report.vulnerabilities && report.vulnerabilities.total ? report.vulnerabilities.total : vulnerabilities.length}
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button onclick="viewFullReport()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 2px solid rgba(255,255,255,0.3); padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem; transition: all 0.3s ease;">
+                    <i class="fas fa-file-alt"></i> View Full Report
+                </button>
+                <button onclick="downloadReport()" style="background: rgba(255,255,255,0.1); color: white; border: 2px solid rgba(255,255,255,0.3); padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem; transition: all 0.3s ease;">
+                    <i class="fas fa-download"></i> Download Report
+                </button>
             </div>
         </div>
     `;
+}
+
+function viewFullReport() {
+    window.open('/api/report/latest', '_blank');
+}
+
+function downloadReport() {
+    window.location.href = '/api/report/download';
+}
+
+function viewSpecificReport(timestamp) {
+    window.open(`/api/report/view/${timestamp}`, '_blank');
+}
+
+function downloadSpecificReport(timestamp) {
+    window.location.href = `/api/report/download/${timestamp}`;
 }
 
 // ============================================================
@@ -460,16 +523,48 @@ async function loadReports() {
             reportDiv.className = 'report-item';
             
             const reportData = report.data;
-            const timestamp = reportData.scan_timestamp || 'Unknown';
-            const vulnerabilities = (reportData.vulnerabilities || []).length;
+            const metadata = reportData.metadata || {};
+            const timestamp = metadata.generated_at || reportData.scan_timestamp || 'Unknown';
+            
+            // Extract timestamp from filename (report_YYYYMMDD_HHMMSS.json)
+            const timestampMatch = report.filename.match(/report_(\d{8}_\d{6})\.json/);
+            const reportTimestamp = timestampMatch ? timestampMatch[1] : null;
+            
+            // Get vulnerability count
+            let vulnerabilities = 0;
+            if (reportData.vulnerabilities) {
+                if (reportData.vulnerabilities.total !== undefined) {
+                    vulnerabilities = reportData.vulnerabilities.total;
+                } else if (Array.isArray(reportData.vulnerabilities)) {
+                    vulnerabilities = reportData.vulnerabilities.length;
+                } else if (reportData.vulnerabilities.list) {
+                    vulnerabilities = reportData.vulnerabilities.list.length;
+                }
+            }
+            
             const score = reportData.security_score || reportData.overall_score || 0;
+            const grade = reportData.grade || 'N/A';
 
             reportDiv.innerHTML = `
-                <h4>📄 Report #${index + 1}</h4>
-                <p><strong>Date:</strong> ${timestamp}</p>
-                <p><strong>Vulnerabilities:</strong> ${vulnerabilities}</p>
-                <p><strong>Security Score:</strong> ${score.toFixed(1)}/100</p>
-                <p><small>${report.filename}</small></p>
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <h4 style="margin: 0 0 0.5rem 0;">📄 Report #${index + 1}</h4>
+                        <p style="margin: 0.25rem 0;"><strong>Date:</strong> ${new Date(timestamp).toLocaleString()}</p>
+                        <p style="margin: 0.25rem 0;"><strong>Vulnerabilities:</strong> ${vulnerabilities}</p>
+                        <p style="margin: 0.25rem 0;"><strong>Security Score:</strong> ${score.toFixed(1)}/100 (${grade})</p>
+                        <p style="margin: 0.25rem 0; font-size: 0.85rem; opacity: 0.7;">${report.filename}</p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        ${reportTimestamp ? `
+                            <button onclick="viewSpecificReport('${reportTimestamp}')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; white-space: nowrap;">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button onclick="downloadSpecificReport('${reportTimestamp}')" style="background: #2d3748; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; white-space: nowrap;">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
             `;
 
             reportsList.appendChild(reportDiv);
@@ -528,3 +623,187 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+// ============================================================
+// TERMINAL
+// ============================================================
+
+let term = null;
+let fitAddon = null;
+let commandHistory = [];
+let historyIndex = -1;
+let currentCommand = '';
+
+function initTerminal() {
+    if (!window.Terminal || term) return;
+
+    // Initialize terminal
+    term = new Terminal({
+        cursorBlink: true,
+        fontSize: 14,
+        fontFamily: 'Courier New, monospace',
+        theme: {
+            background: '#1e1e1e',
+            foreground: '#d4d4d4',
+            cursor: '#d4d4d4',
+            selection: '#264f78',
+            black: '#000000',
+            red: '#cd3131',
+            green: '#0dbc79',
+            yellow: '#e5e510',
+            blue: '#2472c8',
+            magenta: '#bc3fbc',
+            cyan: '#11a8cd',
+            white: '#e5e5e5',
+            brightBlack: '#666666',
+            brightRed: '#f14c4c',
+            brightGreen: '#23d18b',
+            brightYellow: '#f5f543',
+            brightBlue: '#3b8eea',
+            brightMagenta: '#d670d6',
+            brightCyan: '#29b8db',
+            brightWhite: '#e5e5e5'
+        },
+        scrollback: 1000
+    });
+
+    // Initialize fit addon
+    fitAddon = new FitAddon.FitAddon();
+    term.loadAddon(fitAddon);
+
+    // Mount terminal
+    const terminalElement = document.getElementById('terminal');
+    if (terminalElement) {
+        term.open(terminalElement);
+        fitAddon.fit();
+
+        // Welcome message
+        term.writeln('\\x1b[1;32m╔═══════════════════════════════════════════════════════════╗\\x1b[0m');
+        term.writeln('\\x1b[1;32m║         CodeGuardian CLI Terminal - Web Interface        ║\\x1b[0m');
+        term.writeln('\\x1b[1;32m╚═══════════════════════════════════════════════════════════╝\\x1b[0m');
+        term.writeln('');
+        term.writeln('\\x1b[1;36mℹ Type commands or use Quick Commands buttons below\\x1b[0m');
+        term.writeln('\\x1b[1;36mℹ Commands execute in project root directory\\x1b[0m');
+        term.writeln('');
+        writePrompt();
+
+        // Handle keyboard input
+        term.onData(data => handleTerminalInput(data));
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (fitAddon && term) {
+                fitAddon.fit();
+            }
+        });
+    }
+}
+
+function writePrompt() {
+    term.write('\\x1b[1;33mCodeGuardian>\\x1b[0m ');
+}
+
+function handleTerminalInput(data) {
+    const code = data.charCodeAt(0);
+
+    // Handle Enter
+    if (code === 13) {
+        term.writeln('');
+        if (currentCommand.trim()) {
+            executeTerminalCommand(currentCommand.trim());
+            commandHistory.push(currentCommand.trim());
+            historyIndex = commandHistory.length;
+        } else {
+            writePrompt();
+        }
+        currentCommand = '';
+    }
+    // Handle Backspace
+    else if (code === 127) {
+        if (currentCommand.length > 0) {
+            currentCommand = currentCommand.slice(0, -1);
+            term.write('\\b \\b');
+        }
+    }
+    // Handle Up Arrow (history)
+    else if (data === '\\x1b[A') {
+        if (historyIndex > 0) {
+            // Clear current line
+            term.write('\\r\\x1b[K');
+            writePrompt();
+            
+            historyIndex--;
+            currentCommand = commandHistory[historyIndex];
+            term.write(currentCommand);
+        }
+    }
+    // Handle Down Arrow (history)
+    else if (data === '\\x1b[B') {
+        if (historyIndex < commandHistory.length - 1) {
+            // Clear current line
+            term.write('\\r\\x1b[K');
+            writePrompt();
+            
+            historyIndex++;
+            currentCommand = commandHistory[historyIndex];
+            term.write(currentCommand);
+        } else {
+            // Clear current line
+            term.write('\\r\\x1b[K');
+            writePrompt();
+            currentCommand = '';
+            historyIndex = commandHistory.length;
+        }
+    }
+    // Ignore other control characters
+    else if (code < 32 && code !== 9) {
+        return;
+    }
+    // Regular character
+    else {
+        currentCommand += data;
+        term.write(data);
+    }
+}
+
+function executeTerminalCommand(command) {
+    term.writeln(command);
+    term.writeln('\\x1b[2;37m[Executing...]\\x1b[0m');
+
+    // Emit command to server via socket
+    socket.emit('terminal-command', { command });
+}
+
+function clearTerminal() {
+    if (term) {
+        term.clear();
+        term.writeln('\\x1b[1;32mTerminal cleared!\\x1b[0m');
+        term.writeln('');
+        writePrompt();
+    }
+}
+
+function runQuickCommand(command) {
+    if (term) {
+        // Clear current input
+        term.write('\\r\\x1b[K');
+        writePrompt();
+        term.write(command);
+        currentCommand = command;
+        
+        // Simulate Enter key
+        setTimeout(() => {
+            term.writeln('');
+            executeTerminalCommand(command);
+            commandHistory.push(command);
+            historyIndex = commandHistory.length;
+            currentCommand = '';
+        }, 100);
+    }
+}
+
+// Initialize terminal when terminal tab is clicked
+document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-tab="terminal"]')) {
+        setTimeout(initTerminal, 100);
+    }
+});

@@ -804,6 +804,116 @@ body {
 }
 
 /* ============================================================
+   TERMINAL
+   ============================================================ */
+
+.terminal-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-top: 2rem;
+}
+
+.terminal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #1e1e1e 0%, #2d2d30 100%);
+    color: #fff;
+    border-bottom: 1px solid #3e3e42;
+}
+
+.terminal-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.terminal-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.terminal-btn.close { background: #ff5f56; }
+.terminal-btn.minimize { background: #ffbd2e; }
+.terminal-btn.maximize { background: #27c93f; }
+
+.terminal-title {
+    flex: 1;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.terminal-body {
+    background: #1e1e1e;
+    height: 500px;
+    padding: 1rem;
+}
+
+/* Xterm.js styles */
+.xterm {
+    font-family: 'Courier New', monospace !important;
+    font-size: 14px !important;
+}
+
+.xterm .xterm-viewport {
+    overflow-y: hidden !important;
+}
+
+.terminal-quick-commands {
+    background: #f7fafc;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.terminal-quick-commands h3 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.command-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.command-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    color: var(--dark);
+}
+
+.command-btn:hover {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.command-btn i {
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.command-btn span {
+    font-weight: 600;
+}
+
+/* ============================================================
    FOOTER
    ============================================================ */
 

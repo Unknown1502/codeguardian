@@ -1,0 +1,185 @@
+# ==========================================
+# 🔐 Secrets & API Keys
+# ==========================================
+.env
+.env.*
+!.env.example
+*.env
+.api-keys
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+*.pfx
+config/local.json
+
+# ==========================================
+# 🐍 Python
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+virtualenv/
+pipenv/
+.conda/
+
+# Distribution / Packaging
+dist/
+build/
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+pip-wheel-metadata/
+
+# Unit Test / Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ==========================================
+# 📦 Node.js / JavaScript
+# ==========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+package-lock.json
+yarn.lock
+.pnp.*
+
+# ==========================================
+# 🛡️ CodeGuardian Specific
+# ==========================================
+# Reports & Outputs
+reports/
+output/
+battle_results/
+scan_results/
+*.html
+*.json
+!package.json
+!package-lock.json
+summary_*.txt
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Gradio Temp Files
+.gradio/
+gradio_temp/
+
+# Web Dashboard Uploads
+web-dashboard/uploads/
+uploads/
+
+# Test Files
+test_output/
+temp/
+tmp/
+*.tmp
+
+# Cache
+.cache/
+*.cache
+
+# ==========================================
+# 💻 IDE & Editors
+# ==========================================
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.project
+.settings/
+.classpath
+
+# ==========================================
+# 🖥️ Operating System
+# ==========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ==========================================
+# 🗄️ Databases
+# ==========================================
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+
+# ==========================================
+# 🚫 Miscellaneous
+# ==========================================
+# Compiled files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Archives
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Debug files
+*.dmp
+*.stackdump
+core
+
+# User-specific files
+.history/
+.local/

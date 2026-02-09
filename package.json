@@ -1,0 +1,39 @@
+{
+  "name": "codeguardian",
+  "version": "1.0.0",
+  "description": "Autonomous AI Security Audit Agent powered by Gemini 3 Pro",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest",
+    "dashboard": "cd dashboard && npm start"
+  },
+  "keywords": [
+    "security",
+    "gemini",
+    "ai",
+    "autonomous-agent",
+    "vulnerability-scanner",
+    "code-analysis"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.19.0",
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.2",
+    "ws": "^8.14.2",
+    "chalk": "^4.1.2",
+    "cli-progress": "^3.12.0",
+    "js-yaml": "^4.1.0",
+    "acorn": "^8.11.2",
+    "@babel/parser": "^7.23.6",
+    "esprima": "^4.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0"
+  }
+}

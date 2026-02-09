@@ -1,0 +1,78 @@
+# ==========================================
+# Git Attributes - Line Ending Configuration
+# ==========================================
+
+# Auto detect text files and normalize line endings to LF on checkin,
+# but leave them untouched on checkout
+* text=auto
+
+# ==========================================
+# Source Code - Always LF
+# ==========================================
+*.py text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.jsx text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.sh text eol=lf
+*.bash text eol=lf
+
+# ==========================================
+# Jupyter Notebooks - Always LF
+# ==========================================
+*.ipynb text eol=lf
+
+# ==========================================
+# Web Files - Always LF
+# ==========================================
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.xml text eol=lf
+*.svg text eol=lf
+
+# ==========================================
+# Config Files - Always LF
+# ==========================================
+*.conf text eol=lf
+*.config text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.env.example text eol=lf
+Dockerfile text eol=lf
+Makefile text eol=lf
+
+# ==========================================
+# Windows Files - Always CRLF
+# ==========================================
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# ==========================================
+# Binary Files - No Conversion
+# ==========================================
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.db binary
+*.sqlite binary
+*.exe binary
+*.dll binary
